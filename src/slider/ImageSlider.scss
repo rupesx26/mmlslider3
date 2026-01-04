@@ -1,0 +1,430 @@
+// ============================================
+// ImageSlider.scss - Responsive Image Slider
+// ============================================
+
+// Variables
+$slider-height: 70vh;
+$slider-max-height: 600px;
+$container-height: 100vh;
+$border-radius: 16px;
+$transition-duration: 0.5s;
+$ease-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+$nav-button-size: 44px;
+$nav-button-bg: rgba(0, 0, 0, 0.5);
+$nav-button-hover-bg: rgba(0, 0, 0, 0.7);
+$cta-button-bg: #fff;
+$cta-button-text: #000;
+$cta-padding: 12px 28px;
+$cta-border-radius: 999px;
+$breakpoint-tablet: 768px;
+
+// ============================================
+// Main Container & Layout
+// ============================================
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: $container-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #f5f5f5;
+
+  // Prevent layout shift on resize
+  box-sizing: border-box;
+}
+
+// ============================================
+// Slider Wrapper
+// ============================================
+.slider {
+  position: relative;
+  width: 100%;
+  height: $slider-height;
+  max-height: $slider-max-height;
+  min-width: 1024px; // Minimum width for high resolution support
+  perspective: 1000px; // Enable 3D transforms for better visual effect
+
+  // Desktop & Tablet Landscape: Show 3 slides
+  @media (min-width: 1024px) {
+    overflow: visible;
+  }
+
+  // Mobile: Hide side slides, show center only
+  @media (max-width: 767px) {
+    overflow: hidden;
+    border-radius: $border-radius;
+    min-width: auto;
+  }
+}
+
+// ============================================
+// Slide Positioning & Animation
+// ============================================
+.slide {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 1;
+  transform: translateX(0) scale(0.85);
+  transition: all $transition-duration $ease-function;
+  pointer-events: none;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: $border-radius;
+    display: block;
+  }
+
+  // Desktop & Tablet Landscape: Arrange slides horizontally
+  @media (min-width: 1024px) {
+    left: 50%;
+    width: 60%;
+    max-width: 600px;
+    transform: translateX(-50%) scale(0.85);
+  }
+
+  // Tablet Portrait & Mobile: Center slide only
+  @media (max-width: 1023px) {
+    left: 0;
+    width: 100%;
+    transform: translateX(0) scale(1);
+  }
+}
+
+// Active slide - fully visible in center (base size)
+.slide.active {
+  opacity: 1;
+  z-index: 3;
+  pointer-events: auto;
+  transform: translateX(-50%) scale(1);
+
+  @media (max-width: 1023px) {
+    transform: translateX(0) scale(1);
+  }
+}
+
+// Previous slide - 65% hidden on left (35% visible, 15% smaller than center)
+.slide.prev {
+  opacity: 0.5;
+  z-index: 2;
+  transform: translateX(-135%) scale(0.85);
+
+  @media (max-width: 1023px) {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+// Next slide - 65% hidden on right (35% visible, 15% smaller than center)
+.slide.next {
+  opacity: 0.5;
+  z-index: 2;
+  transform: translateX(35%) scale(0.85);
+
+  @media (max-width: 1023px) {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+// Hidden slides (off-screen)
+.slide.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+// ============================================
+// CTA Button
+// ============================================
+.cta {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: $cta-padding;
+  background: $cta-button-bg;
+  border-radius: $cta-border-radius;
+  text-decoration: none;
+  color: $cta-button-text;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10; // Ensure button is above image
+  display: inline-block;
+
+  // Hover effect
+  &:hover {
+    background: #f0f0f0;
+    transform: translateX(-50%) scale(1.05);
+  }
+
+  // Active/Focus state
+  &:active,
+  &:focus {
+    outline: 2px solid #0077ff;
+    outline-offset: 2px;
+  }
+}
+
+// Desktop (≥1024px): Show all buttons (prev, active, next)
+@media (min-width: 1024px) {
+  .cta {
+    opacity: 0.9;
+    pointer-events: auto;
+  }
+
+  // Position prev/next buttons at bottom center of their own slides
+  .slide.prev .cta {
+    bottom: 20px;
+    left: 80%;
+    transform: translateX(-80%);
+  }
+
+  .slide.next .cta {
+    bottom: 20px;
+    left: 20%;
+    transform: translateX(-20%);
+  }
+}
+
+// Tablet Portrait & Mobile (<1024px): Hide buttons by default, show only on active slide
+@media (max-width: 1023px) {
+  .cta {
+    opacity: 0;
+    pointer-events: none;
+    font-size: 13px;
+    padding: 10px 24px;
+  }
+
+  // Show button only on active slide
+  .slide.active .cta {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+// Small phones
+@media (max-width: 480px) {
+  .cta {
+    font-size: 12px;
+    padding: 8px 20px;
+    bottom: 16px;
+  }
+}
+
+// ============================================
+// Navigation Arrows
+// ============================================
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  background: $nav-button-bg;
+  color: #fff;
+  border: none;
+  width: $nav-button-size;
+  height: $nav-button-size;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  padding: 0; // Reset button default padding
+
+  // Hover effect
+  &:hover {
+    background: $nav-button-hover-bg;
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  // Focus state for accessibility
+  &:focus {
+    outline: 2px solid #0077ff;
+    outline-offset: 2px;
+  }
+
+  // Active/pressed state
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  // Previous button - left side
+  &.prev {
+    left: 16px;
+
+    @media (max-width: 1023px) {
+      left: 12px;
+    }
+  }
+
+  // Next button - right side
+  &.next {
+    right: 16px;
+
+    @media (max-width: 1023px) {
+      right: 12px;
+    }
+  }
+
+  // Desktop: Subtle styling
+  @media (min-width: 1024px) {
+    opacity: 0.7;
+    background: rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  // Tablet Portrait & Mobile: More prominent
+  @media (max-width: 1023px) {
+    opacity: 0.8;
+    background: rgba(0, 0, 0, 0.6);
+  }
+}
+
+// ============================================
+// Slide Indicators (Dots)
+// ============================================
+.slide-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 4;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+
+  // Active indicator
+  &.active {
+    background: #fff;
+    transform: scale(1.3);
+  }
+
+  // Hover effect
+  &:hover {
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  // Focus state for accessibility
+  &:focus {
+    outline: 2px solid #0077ff;
+    outline-offset: 2px;
+  }
+
+  // Mobile: Larger indicators
+  @media (max-width: 1023px) {
+    width: 12px;
+    height: 12px;
+    gap: 10px;
+  }
+}
+
+// ============================================
+// Responsive Behavior
+// ============================================
+
+// Desktop & Tablet Landscape (≥ 1024px)
+// Show 3 slides with partial side visibility
+@media (min-width: 1024px) {
+  .slider-container {
+    padding: 0 40px; // Space for navigation buttons
+  }
+}
+
+// Tablet Portrait & Mobile (< 1024px)
+// Show 1 slide centered
+@media (max-width: 1023px) {
+  .slider-container {
+    padding: 0 60px; // Space for nav buttons on mobile
+  }
+
+  .slide-indicators {
+    bottom: 10px;
+  }
+}
+
+// Small phones (< 480px)
+@media (max-width: 480px) {
+  .slider-container {
+    padding: 0 50px; // Slightly reduced padding
+  }
+
+  .nav {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+
+    &.prev {
+      left: 8px;
+    }
+
+    &.next {
+      right: 8px;
+    }
+  }
+}
+
+// ============================================
+// Accessibility & Print
+// ============================================
+
+// Disable animations if user prefers reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .slide,
+  .cta,
+  .nav,
+  .indicator {
+    transition: none;
+  }
+}
+
+// Print styles
+@media print {
+  .slider-container {
+    height: auto;
+  }
+
+  .nav,
+  .slide-indicators {
+    display: none;
+  }
+
+  .slide {
+    position: static;
+    opacity: 1 !important;
+    margin: 20px 0;
+    page-break-inside: avoid;
+  }
+
+  .slide img {
+    max-width: 100%;
+    height: auto;
+  }
+}
