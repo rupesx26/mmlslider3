@@ -10,7 +10,7 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, 'build'),
       filename: isProd ? 'bundle.[contenthash].js' : 'bundle.js',
       clean: true,
-      publicPath: '/'
+      publicPath: isProd ? '/mmlslider3/' : '/'
     },
     resolve: {
       extensions: ['.tsx', '.ts', '.js', '.jsx']
